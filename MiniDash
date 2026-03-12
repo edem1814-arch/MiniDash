@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Mini Dash</title>
+<style>
+body{
+  margin:0;
+  background:#111;
+  overflow:hidden;
+}
+#player{
+  width:40px;
+  height:40px;
+  background:#00ffcc;
+  position:absolute;
+  bottom:50px;
+  left:100px;
+}
+.obstacle{
+  width:40px;
+  height:60px;
+  background:#ff3b3b;
+  position:absolute;
+  bottom:50px;
+}
+</style>
+</head>
+<body>
+
+<div id="player"></div>
+
+<script>
+let player = document.getElementById("player");
+let jumping = false;
+let gravity = 2;
+let velocity = 0;
+let y = 50;
+
+function jump(){
+ if(!jumping){
+   velocity = 20;
+   jumping = true;
+ }
+}
+
+document.addEventListener("keydown", jump);
+document.addEventListener("click", jump);
+
+function createObstacle(){
+ let obs = document.createElement("div");
+ obs.className = "obstacle";
+ obs.style.left = window.innerWidth + "px";
+ document.body.appendChild(obs);
+
+ let move = setInterval(()=>{
+   let left = parseInt(obs.style.left);
+   obs.style.left = (left - 6) + "px";
+
+   let playerRect = player.getBoundingClientRect();
+   let obsRect = obs.getBoundingClientRect();
+
+   if(
+     playerRect.left < obsRect.right &&
+     playerRect.right > obsRect.left &&
+     playerRect.bottom > obsRect.top
+   ){
+     alert("Game Over");
+     location.reload();
+   }
+
+   if(left < -50){
+     obs.remove();
+     clearInterval(move);
+   }
+
+ },20);
+}
+
+setInterval(createObstacle, 2000);
+
+function gameLoop(){
+ velocity -= gravity;
+ y += velocity;
+
+ if(y < 50){
+   y = 50;
+   jumping = false;
+ }
+
+ player.style.bottom = y + "px";
+ requestAnimationFrame(gameLoop);
+}
+
+gameLoop();
+</script>
+
+</body>
+</html>
